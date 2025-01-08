@@ -21,8 +21,8 @@ systems capable of solving complex tasks collaboratively.
 
 1. **Entity-Based Architecture**  
    - Unlike agents, which rely on predefined rules and programming,
-entities in EM Nexus emerge as adaptive constructs capable of solving
-problems through collaboration and learning.  
+     entities in EM Nexus emerge as adaptive constructs capable
+     of solving problems through collaboration and learning.  
    - These entities can dynamically evolve, share knowledge,
 and restructure their operations based on task complexity and
 system goals.  
@@ -31,20 +31,23 @@ system goals.
    - The framework enables the creation of **meta-entities**,
      which act as supervisors for individual entities.  
    - Meta-entities coordinate multi-domain tasks, facilitate
-     collaborative problem-solving, and evolve the system to improve performance.  
+     collaborative problem-solving, and evolve the system to
+     improve performance.  
 
 3. **Holographic Memory Integration**  
-   - EM Nexus incorporates **holographic memory**, a high-dimensional
-     memory system inspired by quantum principles.  
+   - EM Nexus incorporates **holographic memory**,
+     a high-dimensional memory system inspired by quantum principles.  
    - Features include:  
      - Efficient encoding and retrieval of high-dimensional data.  
      - Noise reduction and adaptive compression for resource optimization.  
      - Scalability to handle large datasets across multiple entities.  
 
 4. **Multi-Domain Task Capability**  
-   - The system is designed to handle diverse tasks across domains such as:  
+   - The system is designed to handle diverse tasks across domains
+      such as:  
      - **Mathematics**: Problem-solving and computation.  
-     - **English**: Vocabulary building, grammar learning, and sentence generation.  
+     - **English**: Vocabulary building, grammar learning, and sentence
+         generation.  
      - **Python Programming**: Writing, debugging, and optimizing code.  
 
 5. **Self-Evolution**  
@@ -59,32 +62,35 @@ system goals.
 
 ### **1. Meta Entity Core (`meta_entity_core.py`)**  
 - The **meta-entity** is the central coordinator.  
-- It assigns tasks to entities, collects their results, and manages the overall
-learning process.  
-- Responsible for the **evolution of the system**, refining task execution based
-on past performance.  
+- It assigns tasks to entities, collects their results, and manages
+  the overall learning process.  
+- Responsible for the **evolution of the system**, refining task
+  execution based on past performance.  
 
 ### **2. Super Entity Core (`entity_core.py`)**  
 - Represents individual entities within the system.  
-- Each super entity operates autonomously but collaborates with other entities
-through the meta-entity.  
-- Integrates with holographic memory for task-specific data storage and retrieval.  
+- Each super entity operates autonomously but collaborates with
+  other entities through the meta-entity.  
+- Integrates with holographic memory for task-specific
+  data storage and retrieval.  
 
 ### **3. Holographic Memory (`holographic_memory.py`)**  
 - A high-dimensional memory system that enables:  
-  - Encoding of key-value pairs for tasks, results, and intermediate data.  
-  - Efficient retrieval with noise reduction techniques such as Gaussian and
-    median filtering.  
+  - Encoding of key-value pairs for tasks, results,
+    and intermediate data.  
+  - Efficient retrieval with noise reduction techniques such as
+    Gaussian and median filtering.  
   - Compression to optimize resource usage without compromising accuracy.  
 
 ### **4. Math Module (`math_module.py`)**  
 - Stores and retrieves solutions to mathematical problems.  
-- Facilitates learning of mathematical concepts such as addition, subtraction,
-  and more complex operations.  
+- Facilitates learning of mathematical concepts such as
+  addition, subtraction, and more complex operations.  
 
 ### **5. English Module (`english_module.py`)**  
 - Handles English vocabulary and grammar tasks.  
-- Stores word meanings and grammatical rules for sentence generation and comprehension.  
+- Stores word meanings and grammatical rules for sentence generation
+  and comprehension.  
 
 ### **6. Programming Module (`programming_module.py`)**  
 - Focuses on Python programming.  
@@ -97,7 +103,8 @@ through the meta-entity.
 
 ### **8. Main Entry Point (`main.py`)**  
 - Initializes the framework and orchestrates task execution.  
-- Demonstrates the system’s ability to process multi-domain tasks collaboratively.  
+- Demonstrates the system’s ability to process multi-domain
+  tasks collaboratively.  
 
 ---
 
