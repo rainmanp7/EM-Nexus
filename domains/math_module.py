@@ -1,5 +1,7 @@
+# domains/math_module.py
+
 import numpy as np
-from holographic_memory import HolographicMemory
+from core.holographic_memory import HolographicMemory
 
 class MathModule:
     def __init__(self, memory_dimensions=16384):
@@ -7,9 +9,7 @@ class MathModule:
 
     def store_math_problem(self, problem, solution):
         """
-        Encode a math problem and its solution into holographic memory.
-        :param problem: String representation of the problem.
-        :param solution: Numerical solution to the problem.
+        Store a math problem and its solution in holographic memory.
         """
         problem_vector = np.random.randn(self.memory.dimensions)
         solution_vector = np.array([solution] * self.memory.dimensions)
@@ -18,15 +18,17 @@ class MathModule:
     def retrieve_solution(self, problem):
         """
         Retrieve a solution for a given math problem from holographic memory.
-        :param problem: String representation of the problem.
-        :return: Retrieved solution (approximation).
         """
         problem_vector = np.random.randn(self.memory.dimensions)
         return self.memory.retrieve(problem_vector)
 
-# Example usage
-if __name__ == "__main__":
-    math_module = MathModule()
-    math_module.store_math_problem("5 + 5", 10)
-    retrieved_solution = math_module.retrieve_solution("5 + 5")
-    print(f"Retrieved solution: {retrieved_solution[:5]}")
+    def process(self, task_input):
+        """
+        Process a math task.
+        """
+        if isinstance(task_input, dict) and "type" in task_input:
+            if task_input["type"] == "addition":
+                a = task_input.get("a", 0)
+                b = task_input.get("b", 0)
+                return a + b
+        return "Unsupported math task."
