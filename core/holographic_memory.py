@@ -1,10 +1,12 @@
+import os
+import sqlite3
+import networkx as nx
 import numpy as np
 from scipy.fft import fft, ifft
 from scipy.linalg import qr
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import medfilt
 from sklearn.metrics import mean_squared_error
-#import psutil
 import time
 import logging
 
@@ -112,7 +114,78 @@ class HolographicMemory:
                 break
 
 
-#
+class MemoryStore:
+    def __init__(self, db_path, holographic_dimensions=1024, regularisation=0.01):
+        self.db_path = db_path
+        self.ensure_directory_exists()
+        self.conn = sqlite3.connect(db_path)
+        self.holographic_memory = HolographicMemory(dimensions=holographic_dimensions, initial_regularization=regularisation)
+        self._initialize_db()
+
+    def ensure_directory_exists(self):
+        directory = os.path.dirname(self.db_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    def _initialize_db(self):
+        try:
+            with self.conn:
+                self.conn.execute("""
+                    CREATE TABLE IF NOT EXISTS knowledge (
+                        id INTEGER PRIMARY KEY,
+                        input TEXT,
+                        output TEXT,
+                        domain TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+            logging.info(f"Database initialized at {self.db_path}.")
+        except sqlite3.Error as e:
+            logging.error(f"Database initialization failed: {e}")
+
+    def store_knowledge(self, input_data, output_data, domain):
+        try:
+            with self.conn:
+                self.conn.execute("""
+                    INSERT INTO knowledge (input, output, domain) VALUES (?, ?, ?)
+                """, (input_data, output_data, domain))
+            logging.info(f"Knowledge stored: {input_data} -> {output_data} in domain {domain}")
+        except sqlite3.Error as e:
+            logging.error(f"Failed to store knowledge: {e}")
+
+        # Holographic storage
+        key = self._text_to_vector(input_data)
+        value = self._text_to_vector(output_data)
+        self.holographic_memory.dynamic_encode(key, value)
+
+    def retrieve_holographic(self, query_text):
+        """
+        Retrieve knowledge using holographic memory.
+        :param query_text: Text query to find matching knowledge.
+        :return: Retrieved knowledge as text.
+        """
+        try:
+            query_vector = self._text_to_vector(query_text)
+            result_vector = self.holographic_memory.retrieve(query_vector)
+            return self._vector_to_text(result_vector)
+        except Exception as e:
+            logging.error(f"Failed to retrieve knowledge: {e}")
+            return None
+
+    @staticmethod
+    def _text_to_vector(text, dimensions=1024):
+        """
+        Convert text into a high-dimensional vector.
+        """
+        np.random.seed(hash(text) % (2**32))  # Consistent hash for text
+        return np.random.randn(dimensions)
+
+    @staticmethod
+    def _vector_to_text(vector):
+        """
+        Convert a vector back to a textual representation.
+        """
+        return f"Vector[{len(vector)} dimensions]: {np.round(vector[:5], 3)}..."
 
 
 def test_scaled_holographic_memory():
