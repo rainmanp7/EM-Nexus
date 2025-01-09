@@ -1,5 +1,16 @@
+import sys
+import os
+
+# Add the root directory to sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(root_dir)
+
+# Now you can use absolute imports
 from memory_store import MemoryStore
-from meta_learning import MetaLearning
+from core.meta_learning import MetaLearning
+from core.entity_core import SuperEntity
+
+# Rest of your code...
 
 class MetaEntity:
     def __init__(self, name):
@@ -37,7 +48,6 @@ class MetaEntity:
         self.meta_learning.evolve_entities(self.entities)
 
 if __name__ == "__main__":
-    from entity_core import SuperEntity
 
     meta_entity = MetaEntity("MetaSuperEntity")
     entity1 = SuperEntity("Entity1", meta_entity)
