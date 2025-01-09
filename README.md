@@ -186,3 +186,9 @@ While AGI aims to replicate human-like intelligence, EM Nexus goes beyond by cre
 ```bash
 git clone https://github.com/username/EM-Nexus.git
 cd EM-Nexus
+
+
+
+Creation Location:
+Maliguya, Sinoron, Santacruz, Davao Del Sur, Mindanao, Philippines.
+By: Chris Brown aka rainmanp7.
