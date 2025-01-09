@@ -1,3 +1,6 @@
+# core/meta_entity_core.py
+# diagnostic_test.py
+
 import sys
 import os
 
@@ -5,12 +8,9 @@ import os
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(root_dir)
 
-# Now you can use absolute imports
 from memory_store import MemoryStore
 from core.meta_learning import MetaLearning
 from core.entity_core import SuperEntity
-
-# Rest of your code...
 
 class MetaEntity:
     def __init__(self, name):
@@ -36,34 +36,16 @@ class MetaEntity:
         for task in meta_task["sub_tasks"]:
             for entity in self.entities:
                 if task["domain"] in entity.modules:
-                    results.append(entity.process_task(task["domain"], task["input"]))
-        self.meta_learning.optimize_learning(results)
+                    result = entity.process_task(task["domain"], task["input"])
+                    results.append(result)
+        # Optimize learning based on raw results
+        meta_metric = self.meta_learning.optimize_learning(results)
+        print(f"[{self.name}] Meta-metric after optimization: {meta_metric:.2f}")
         return results
 
     def evolve_system(self):
         """Optimize and restructure the entity system based on meta-learning results."""
-        task_results = [{"accuracy": 0.9}, {"accuracy": 0.95}, {"accuracy": 0.85}]  # Example data
+        task_results = [30, "Learning the word: collaboration", "def factorial(n): ..."]  # Example data
         meta_metric = self.meta_learning.optimize_learning(task_results)
         print(f"[{self.name}] Meta-metric after optimization: {meta_metric:.2f}")
         self.meta_learning.evolve_entities(self.entities)
-
-if __name__ == "__main__":
-
-    meta_entity = MetaEntity("MetaSuperEntity")
-    entity1 = SuperEntity("Entity1", meta_entity)
-    entity2 = SuperEntity("Entity2", meta_entity)
-
-    meta_entity.register_entity(entity1)
-    meta_entity.register_entity(entity2)
-
-    # Example meta-task
-    meta_task = {
-        "description": "Collaborative task across domains",
-        "sub_tasks": [
-            {"domain": "math", "input": {"type": "addition", "a": 10, "b": 20}},
-            {"domain": "english", "input": "Learn the word 'collaboration'"},
-            {"domain": "python", "input": "Write a function to calculate factorial"},
-        ],
-    }
-    results = meta_entity.process_meta_task(meta_task)
-    print(f"[{meta_entity.name}] Meta-task results: {results}")
