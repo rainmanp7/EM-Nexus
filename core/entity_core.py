@@ -1,22 +1,32 @@
+import sys
+import os
+
+# Add the root directory to sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(root_dir)
+
+# Now you can use absolute imports
+
 from memory_store import MemoryStore
-from learning_engine import LearningEngine
-from entanglement_hub import EntanglementHub
+from core.learning_engine import LearningEngine
+from core.entanglement_hub import EntanglementHub
 from domains.math_module import MathModule
 from domains.english_module import EnglishModule
 from domains.python_module import PythonModule
 
 class SuperEntity:
-    def __init__(self, name, meta_entity=None):
+    def __init__(self, name, meta_entity=None, holographic_memory=None):
         self.name = name
         self.memory = MemoryStore(db_path="data/entity_memory.db")
         self.learning_engine = LearningEngine(self.memory)
         self.entanglement_hub = EntanglementHub(self.name)
         self.modules = {
-            "math": MathModule(self.learning_engine),
-            "english": EnglishModule(self.learning_engine),
-            "python": PythonModule(self.learning_engine),
+            "math": MathModule(memory_dimensions=16384),  # Correct initialization
+            "english": EnglishModule(memory_dimensions=16384),  # Correct initialization
+            "python": PythonModule(self.learning_engine),  # LearningEngine is passed here
         }
         self.meta_entity = meta_entity  # Link to meta-entity, if applicable
+        self.holographic_memory = holographic_memory  # Link to holographic memory, if applicable
 
     def process_task(self, domain, task_input):
         if domain in self.modules:
@@ -39,5 +49,5 @@ class SuperEntity:
             print(f"Task result: {result}")
 
 if __name__ == "__main__":
-    entity = SuperEntity("SuperEntity1")
-    entity.run()
+    from main import main  # Move import inside the if __name__ == "__main__" block
+    main()
