@@ -1,5 +1,5 @@
 import numpy as np
-from holographic_memory import HolographicMemory
+from core.holographic_memory import HolographicMemory
 
 class ProgrammingModule:
     def __init__(self, memory_dimensions=16384):
