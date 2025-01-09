@@ -1,5 +1,5 @@
-from math_module import MathModule
-from english_module import EnglishModule
+from domains.math_module import MathModule
+from domains.english_module import EnglishModule
 from programming_module import ProgrammingModule
 
 class EntityController:
