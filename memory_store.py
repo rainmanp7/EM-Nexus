@@ -21,14 +21,13 @@ class HolographicMemory:
         :param initial_regularization: Starting regularization value for iterative encoding.
         """
         self.dimensions = dimensions
-        self.memory_space = np.zeros(dimensions, dtype=complex)
+        self.memory_space = np.zeros(dimensions, dtype=complex)  # Memory space
         self.initial_regularization = initial_regularization
-        self.keys = []
-        self.values = []
 
     def normalize(self, vector):
         """Normalize a vector to unit length."""
-        return vector / np.linalg.norm(vector)
+        norm = np.linalg.norm(vector)
+        return vector / norm if norm != 0 else vector
 
     def encode(self, key, value, regularization):
         """
@@ -42,10 +41,6 @@ class HolographicMemory:
         key_fft = fft(key, n=self.dimensions)
         value_fft = fft(value, n=self.dimensions)
         self.memory_space += key_fft * value_fft * (1 + regularization)
-
-        # Store key-value pair for debugging or later use
-        self.keys.append(key)
-        self.values.append(value)
 
     def retrieve(self, key):
         """
@@ -71,33 +66,7 @@ class HolographicMemory:
         value = medfilt(value, kernel_size=median_width)
         return value
 
-    def compress_memory(self, threshold=None):
-        """
-        Compress the memory by removing low-magnitude elements.
-        :param threshold: Threshold for compression. If None, use adaptive thresholding.
-        """
-        if threshold is None:
-            threshold = self.adaptive_threshold()
-        mask = np.abs(self.memory_space) > threshold
-        self.memory_space[~mask] = 0
-
-    def adaptive_threshold(self, percentile=90):
-        """
-        Calculate an adaptive threshold based on memory space values.
-        :param percentile: Percentile for determining threshold.
-        :return: Threshold value.
-        """
-        return np.percentile(np.abs(self.memory_space), percentile)
-
-    def adaptive_regularization(self, iteration):
-        """
-        Calculate adaptive regularization for iterative encoding.
-        :param iteration: Current iteration number.
-        :return: Regularization value.
-        """
-        return self.initial_regularization * np.exp(-iteration / 10)
-
-    def dynamic_encode(self, key, value, max_iterations=20, tolerance=1e-4):
+    def dynamic_encode(self, key, value, max_iterations=10, tolerance=1e-4):
         """
         Dynamically encode a key-value pair using adaptive regularization.
         :param key: Key vector (1D array).
@@ -106,22 +75,30 @@ class HolographicMemory:
         :param tolerance: Tolerance for convergence.
         """
         for i in range(max_iterations):
-            regularization = self.adaptive_regularization(i)
+            regularization = self.initial_regularization * np.exp(-i / 10)  # Adaptive regularization
             previous_memory = self.memory_space.copy()
             self.encode(key, value, regularization)
             if np.linalg.norm(self.memory_space - previous_memory) < tolerance:
                 logging.info(f"[HolographicMemory] Converged after {i + 1} iterations.")
                 break
 
+    def compress_memory(self, threshold=None):
+        """
+        Compress the memory by removing low-magnitude elements.
+        :param threshold: Threshold for compression. If None, use adaptive thresholding.
+        :return: Compression ratio (percentage of memory retained).
+        """
+        if threshold is None:
+            threshold = np.percentile(np.abs(self.memory_space), 75)  # Retain 25% of memory
+        mask = np.abs(self.memory_space) > threshold
+        retained_elements = np.sum(mask)
+        compression_ratio = retained_elements / self.dimensions
+        self.memory_space[~mask] = 0
+        return compression_ratio
+
 
 class MemoryStore:
     def __init__(self, db_path, holographic_dimensions=16384, regularisation=0.01):
-        """
-        Initialize the memory store with a SQLite database and holographic memory.
-        :param db_path: Path to the SQLite database.
-        :param holographic_dimensions: Dimensions for holographic memory.
-        :param regularisation: Regularization factor for holographic memory.
-        """
         self.db_path = db_path
         self.ensure_directory_exists()
         self.conn = sqlite3.connect(db_path)
@@ -152,12 +129,6 @@ class MemoryStore:
             logging.error(f"Database initialization failed: {e}")
 
     def store_knowledge(self, input_data, output_data, domain):
-        """
-        Store knowledge in both SQLite and holographic memory.
-        :param input_data: Input text data.
-        :param output_data: Output text data.
-        :param domain: Domain of the knowledge.
-        """
         try:
             with self.conn:
                 self.conn.execute("""
