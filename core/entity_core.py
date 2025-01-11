@@ -1,5 +1,4 @@
 # core/entity_core.py
-# diagnostic_test.py
 
 import sys
 import os
@@ -19,14 +18,17 @@ from domains.science_module import ScienceModule
 class SuperEntity:
     def __init__(self, name, meta_entity=None, holographic_memory=None):
         self.name = name
-        self.memory = MemoryStore(db_path="data/entity_memory.db")
-        self.learning_engine = LearningEngine(self.memory)
+        self.math_memory = MemoryStore(db_path="data/math.db")
+        self.english_memory = MemoryStore(db_path="data/english.db")
+        self.programming_memory = MemoryStore(db_path="data/programming.db")
+        self.science_memory = MemoryStore(db_path="data/science.db")
+        self.learning_engine = LearningEngine(self.math_memory)  # Default to math memory
         self.entanglement_hub = EntanglementHub(self.name)
         self.modules = {
-            "math": MathModule(memory_dimensions=16384),
-            "english": EnglishModule(memory_dimensions=16384),
-            "python": PythonModule(self.learning_engine),
-            "science": ScienceModule(self.learning_engine),
+            "math": MathModule(memory_dimensions=16384, memory_store=self.math_memory),
+            "english": EnglishModule(memory_dimensions=16384, memory_store=self.english_memory),
+            "python": PythonModule(self.learning_engine, memory_store=self.programming_memory),
+            "science": ScienceModule(self.learning_engine, memory_store=self.science_memory),
         }
         self.meta_entity = meta_entity
         self.holographic_memory = holographic_memory

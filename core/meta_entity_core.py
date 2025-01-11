@@ -25,7 +25,7 @@ class MetaEntity:
 
     def integrate_task_result(self, entity_name, domain, result):
         """Store and analyze task results from an individual entity."""
-        self.memory.store_knowledge(f"Result from {entity_name}", result, domain)
+        self.memory.store_knowledge(f"Result from {entity_name}", str(result), domain)
         print(f"[{self.name}] Integrated result from {entity_name} in domain '{domain}': {result}")
 
     def process_meta_task(self, meta_task):
