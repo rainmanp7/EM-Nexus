@@ -27,5 +27,6 @@ class EnglishModule:
         Process an English task.
         """
         if isinstance(task_input, str):
+            # Return a string instead of a numpy array
             return f"Learning the word: {task_input}"
         return "Unsupported English task."
