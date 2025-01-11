@@ -1,12 +1,18 @@
 from domains.math_module import MathModule
 from domains.english_module import EnglishModule
 from programming_module import ProgrammingModule
+from core.learning_engine import LearningEngine
+from memory_store import MemoryStore
 
 class EntityController:
     def __init__(self):
+        # Initialize the LearningEngine with a MemoryStore
+        learning_engine = LearningEngine(MemoryStore("data/entity_memory.db"))
+
+        # Initialize modules with required arguments
         self.math_module = MathModule()
         self.english_module = EnglishModule()
-        self.programming_module = ProgrammingModule()
+        self.programming_module = ProgrammingModule(learning_engine)
 
     def process_task(self, task_type, input_data):
         """

@@ -127,6 +127,12 @@ class MemoryStore:
             logging.error(f"Database initialization failed: {e}")
 
     def store_knowledge(self, input_data, output_data, domain):
+        """
+        Store knowledge in the database.
+        :param input_data: Input data (e.g., task or query).
+        :param output_data: Output data (e.g., result or response).
+        :param domain: Domain of the knowledge (e.g., math, english, programming).
+        """
         try:
             with self.conn:
                 self.conn.execute("""
@@ -180,7 +186,6 @@ class MemoryStore:
         Convert a vector back to a textual representation.
         """
         return f"Vector[{len(vector)} dimensions]: {np.round(vector[:5], 3)}..."
-
 
 def initialize_database(db_path):
     """

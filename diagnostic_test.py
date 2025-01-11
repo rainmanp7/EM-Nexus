@@ -2,6 +2,7 @@
 
 import sys
 import os
+import sqlite3
 
 # Add the root directory to sys.path
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -34,6 +35,51 @@ def test_database_setup():
     initialize_database("data/test_meta_memory.db")
     print("Database setup test passed.\n")
 
+def test_domain_databases():
+    print("Testing domain-specific databases...")
+    domain_databases = {
+        "math": "data/math.db",
+        "english": "data/english.db",
+        "programming": "data/programming.db",
+        "science": "data/science.db",
+    }
+
+    for domain, db_path in domain_databases.items():
+        print(f"Testing {domain} database at {db_path}...")
+        try:
+            # Connect to the database
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            # Verify the knowledge table exists
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge';")
+            table_exists = cursor.fetchone()
+            if not table_exists:
+                raise ValueError(f"Table 'knowledge' does not exist in {db_path}")
+
+            # Insert a test record
+            test_input = f"Test input for {domain}"
+            test_output = f"Test output for {domain}"
+            cursor.execute("INSERT INTO knowledge (input, output) VALUES (?, ?)", (test_input, test_output))
+            conn.commit()
+
+            # Retrieve the test record
+            cursor.execute("SELECT input, output FROM knowledge WHERE input = ?", (test_input,))
+            result = cursor.fetchone()
+            if not result or result[0] != test_input or result[1] != test_output:
+                raise ValueError(f"Data retrieval failed in {db_path}")
+
+            # Clean up the test record
+            cursor.execute("DELETE FROM knowledge WHERE input = ?", (test_input,))
+            conn.commit()
+
+            print(f"{domain} database test passed.")
+        except sqlite3.Error as e:
+            print(f"Error testing {domain} database: {e}")
+        finally:
+            conn.close()
+    print("All domain database tests passed.\n")
+
 def test_entity_controller():
     print("Testing EntityController...")
     controller = EntityController()
@@ -57,7 +103,14 @@ def test_holographic_memory():
 
 def test_programming_module():
     print("Testing ProgrammingModule...")
-    module = ProgrammingModule()
+    
+    # Initialize LearningEngine with a MemoryStore
+    learning_engine = LearningEngine(MemoryStore("data/test_entity_memory.db"))
+    
+    # Initialize ProgrammingModule with the learning_engine
+    module = ProgrammingModule(learning_engine)
+    
+    # Test storing and retrieving a code snippet
     module.store_code_snippet("print('Hello, World!')", "Prints a greeting message")
     retrieved_description = module.retrieve_description("print('Hello, World!')")
     print(f"Retrieved description: {retrieved_description[:5]}")
@@ -155,6 +208,7 @@ def test_hyperdimensional_utils():
 
 def main():
     test_database_setup()
+    test_domain_databases()  # New test for domain databases
     test_entity_controller()
     test_holographic_memory()
     test_programming_module()
