@@ -4,8 +4,9 @@ import numpy as np
 from core.holographic_memory import HolographicMemory
 
 class MathModule:
-    def __init__(self, memory_dimensions=16384):
+    def __init__(self, memory_dimensions=16384, memory_store=None):
         self.memory = HolographicMemory(dimensions=memory_dimensions)
+        self.memory_store = memory_store
 
     def store_math_problem(self, problem, solution):
         """
@@ -14,6 +15,8 @@ class MathModule:
         problem_vector = np.random.randn(self.memory.dimensions)
         solution_vector = np.array([solution] * self.memory.dimensions)
         self.memory.dynamic_encode(problem_vector, solution_vector)
+        if self.memory_store:
+            self.memory_store.store_knowledge(str(problem), str(solution))
 
     def retrieve_solution(self, problem):
         """

@@ -4,17 +4,20 @@ import numpy as np
 from core.holographic_memory import HolographicMemory
 
 class ScienceModule:
-    def __init__(self, learning_engine, memory_dimensions=16384):
+    def __init__(self, learning_engine, memory_dimensions=16384, memory_store=None):
         self.engine = learning_engine
         self.memory = HolographicMemory(dimensions=memory_dimensions)
+        self.memory_store = memory_store
 
     def store_science_problem(self, problem, solution):
         """
-        Store a science problem and its solution in holographic memory.
+        Store a science problem and its solution in holographic memory and the database.
         """
         problem_vector = np.random.randn(self.memory.dimensions)
         solution_vector = np.array([solution] * self.memory.dimensions)
         self.memory.dynamic_encode(problem_vector, solution_vector)
+        if self.memory_store:
+            self.memory_store.store_knowledge(str(problem), str(solution))
 
     def retrieve_solution(self, problem):
         """
