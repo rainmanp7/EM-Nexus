@@ -1,5 +1,4 @@
-# core/meta_entity_core.py
-# diagnostic_test.py
+# meta_entity_core.py
 
 import sys
 import os
@@ -38,6 +37,7 @@ class MetaEntity:
                 if task["domain"] in entity.modules:
                     result = entity.process_task(task["domain"], task["input"])
                     results.append(result)
+                    self.integrate_task_result(entity.name, task["domain"], result)
         # Optimize learning based on raw results
         meta_metric = self.meta_learning.optimize_learning(results)
         print(f"[{self.name}] Meta-metric after optimization: {meta_metric:.2f}")
