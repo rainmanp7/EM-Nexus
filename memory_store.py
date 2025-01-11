@@ -1,13 +1,11 @@
+# memory_store.py
+
 import os
 import sqlite3
-import networkx as nx
 import numpy as np
 from scipy.fft import fft, ifft
-from scipy.linalg import qr
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import medfilt
-from sklearn.metrics import mean_squared_error
-import time
 import logging
 
 # Configure logging
@@ -170,6 +168,9 @@ class MemoryStore:
         """
         Convert text into a high-dimensional vector.
         """
+        if isinstance(text, np.ndarray):
+            # Convert numpy array to string
+            text = str(text.tolist())  # Convert array to list, then to string
         np.random.seed(hash(text) % (2**32))  # Consistent hash for text
         return np.random.randn(dimensions)
 
@@ -188,70 +189,3 @@ def initialize_database(db_path):
     """
     store = MemoryStore(db_path, holographic_dimensions=16384, regularisation=0.01)
     store.close()  # Close the database connection after initialization
-
-
-# Initialize databases
-initialize_database("data/entity_memory.db")
-initialize_database("data/meta_memory.db")
-
-
-if __name__ == "__main__":
-    # Test the holographic memory with a scaled test
-    def test_scaled_holographic_memory():
-        dimensions = 16384  # Increased dimensions for high accuracy
-        num_pairs = 100  # Number of key-value pairs
-        memory = HolographicMemory(dimensions)
-
-        logging.info(f"[Test] Encoding {num_pairs} key-value pairs into holographic memory...")
-        start_time = time.time()
-
-        # Generate orthogonal keys and random values
-        keys = np.random.randn(dimensions, num_pairs)
-        Q, _ = qr(keys, mode='economic')
-        keys = Q.T
-        values = [np.random.randn(dimensions) for _ in range(num_pairs)]
-
-        # Encode key-value pairs with dynamic iterations
-        for i in range(num_pairs):
-            memory.dynamic_encode(keys[i], values[i])
-
-        encoding_time = time.time() - start_time
-        logging.info(f"[Performance] Encoding completed in {encoding_time:.2f} seconds.")
-
-        logging.info("[Test] Retrieval and Accuracy Testing...")
-        mse_list = []
-
-        # Retrieve and calculate accuracy
-        for i in range(num_pairs):
-            retrieved_value = memory.retrieve(keys[i])
-            mse = mean_squared_error(values[i], retrieved_value)
-            mse_list.append(mse)
-
-        average_mse = np.mean(mse_list)
-        logging.info(f"\n[Results] Average MSE across {num_pairs} key-value pairs: {average_mse:.5f}")
-
-        # Check if MSE is below the desired threshold
-        if average_mse < 500:
-            logging.info(f"MSE value is below 500: {average_mse:.5f}")
-        else:
-            logging.info(f"MSE value is above 500: {average_mse:.5f}")
-
-        # Apply compression
-        logging.info("\n[Compression Test] Applying compression to memory...")
-        memory.compress_memory()
-
-        mse_list_compressed = []
-
-        # Retrieve and calculate accuracy after compression
-        for i in range(num_pairs):
-            retrieved_value_compressed = memory.retrieve(keys[i])
-            mse_compressed = mean_squared_error(values[i], retrieved_value_compressed)
-            mse_list_compressed.append(mse_compressed)
-
-        average_mse_compressed = np.mean(mse_list_compressed)
-        logging.info(f"[Results] Average MSE after compression: {average_mse_compressed:.5f}")
-
-        retrieval_time = time.time() - start_time
-        logging.info(f"[Performance] Total execution time: {retrieval_time:.2f} seconds.")
-
-    test_scaled_holographic_memory()
