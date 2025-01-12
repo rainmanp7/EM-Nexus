@@ -1,12 +1,4 @@
-# core/meta_learning.py
-# diagnostic_test.py
-
-import sys
-import os
-
-# Add the root directory to sys.path
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(root_dir)
+# meta_learning.py
 
 class MetaLearning:
     def __init__(self):
@@ -29,7 +21,11 @@ class MetaLearning:
     def evolve_entities(self, entities):
         """
         Dynamically restructure entities based on meta-knowledge.
+        Only SuperEntities have a learning_engine, so we filter them out.
         """
         print("[MetaLearning] Evolving entity structure...")
         for entity in entities:
-            entity.learning_engine.restructure_model()
+            if hasattr(entity, "learning_engine"):  # Check if the entity has a learning_engine
+                entity.learning_engine.restructure_model()
+            else:
+                print(f"[MetaLearning] Skipping evolution for {entity.name} (no learning_engine).")
