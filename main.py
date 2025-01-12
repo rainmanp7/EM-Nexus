@@ -3,27 +3,32 @@
 from core.entity_core import SuperEntity
 from core.meta_entity_core import MetaEntity
 from core.holographic_memory import HolographicMemory
-from PSDSOm2 import EmergentEntity, Environment
+from core.normal_entity import NormalEntity
+from core.learning_engine import LearningEngine
+from memory_store import MemoryStore
 import numpy as np
 
 def main():
-    # Initialize MetaEntity and HolographicMemory
-    meta_entity = MetaEntity("MetaSuperEntity")
+    # Initialize HolographicMemory
     memory_dimensions = 16384
     holographic_memory = HolographicMemory(dimensions=memory_dimensions)
 
-    # Initialize SuperEntities and register them with the MetaEntity
-    entity1 = SuperEntity("Entity1", meta_entity, holographic_memory)
-    entity2 = SuperEntity("Entity2", meta_entity, holographic_memory)
-    meta_entity.register_entity(entity1)
-    meta_entity.register_entity(entity2)
+    # Initialize 2 MetaEntities
+    meta_entity1 = MetaEntity("MetaEntity1")
+    meta_entity2 = MetaEntity("MetaEntity2")
 
-    # Initialize EmergentEntity and Environment
-    initial_state = np.random.normal(0, 1, 10)
-    possible_actions = np.random.normal(0, 1, 10)
-    perception_mechanism = np.random.normal(0, 1, 10)
-    emergent_entity = EmergentEntity(initial_state, possible_actions, perception_mechanism)
-    environment = Environment({"param1": 1.0, "param2": 2.0})
+    # Initialize 2 SuperEntities and register them with MetaEntities
+    super_entity1 = SuperEntity("SuperEntity1", meta_entity1, holographic_memory)
+    super_entity2 = SuperEntity("SuperEntity2", meta_entity2, holographic_memory)
+    meta_entity1.register_entity(super_entity1)
+    meta_entity2.register_entity(super_entity2)
+
+    # Initialize 2 NormalEntities with LearningEngine and MemoryStore
+    learning_engine = LearningEngine(MemoryStore("data/entity_memory.db"))
+    normal_entity1 = NormalEntity("NormalEntity1", domain="math", learning_engine=learning_engine)
+    normal_entity2 = NormalEntity("NormalEntity2", domain="english", learning_engine=learning_engine)
+    meta_entity1.register_normal_entity(normal_entity1)
+    meta_entity2.register_normal_entity(normal_entity2)
 
     # Define collaborative tasks
     collaborative_tasks = [
@@ -40,16 +45,35 @@ def main():
     # Collaborative training loop
     for task in collaborative_tasks:
         print(f"[Main] Starting Meta-Task: {task['description']}")
-        results = meta_entity.process_meta_task(task)
+        results = meta_entity1.process_meta_task(task)
         print(f"[Main] Meta-Task Results: {results}")
 
-        # Train EmergentEntity using the results
+        # Train entities using the results
         for result in results:
-            emergent_entity.interact_with_environment(environment)
-            print(f"[Main] EmergentEntity State: {emergent_entity.state}")
+            if isinstance(result, dict) and "domain" in result:
+                if result["domain"] == "math":
+                    # Extract the numerical result from the string (e.g., "Solution: 30" -> 30)
+                    result_value = float(result["result"].split(": ")[1]) if "Solution: " in result["result"] else 0
+                    # Convert input_data (dictionary) to a numerical array (e.g., [10, 20])
+                    input_data = np.array([task["sub_tasks"][0]["input"]["a"], task["sub_tasks"][0]["input"]["b"]], dtype=float)
+                    normal_entity1.learning_engine.learn(input_data, result_value)
+                elif result["domain"] == "english":
+                    # Convert the English result to a numerical format (e.g., hash of the string)
+                    result_value = float(hash(result["result"]))
+                    # Convert input_data (string) to a numerical array (e.g., hash of the string)
+                    input_data = np.array([float(hash(task["sub_tasks"][1]["input"]))], dtype=float)
+                    normal_entity2.learning_engine.learn(input_data, result_value)
+                elif result["domain"] == "python":
+                    # Convert the Python result to a numerical format (e.g., hash of the string)
+                    result_value = float(hash(result["result"]))
+                    # Convert input_data (string) to a numerical array (e.g., hash of the string)
+                    input_data = np.array([float(hash(task["sub_tasks"][2]["input"]))], dtype=float)
+                    super_entity1.learning_engine.learn(input_data, result_value)
+
+        print(f"[Main] Entities trained using task results.")
 
     print("[Main] Evolving the system based on task results...")
-    meta_entity.evolve_system()
+    meta_entity1.evolve_system()
 
 if __name__ == "__main__":
     main()
