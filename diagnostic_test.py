@@ -93,12 +93,24 @@ def test_entity_controller():
 
 def test_holographic_memory():
     print("Testing HolographicMemory...")
-    memory = HolographicMemory(dimensions=16384)
+    memory = HolographicMemory(dimensions=16384, memory_file="data/test_holographic_memory.npy")
+    
+    # Test encoding and retrieval
     key = np.random.randn(16384)
     value = np.random.randn(16384)
     memory.dynamic_encode(key, value)
     retrieved_value = memory.retrieve(key)
     print(f"Retrieved value: {retrieved_value[:5]}")
+    
+    # Test persistence by reloading memory
+    memory2 = HolographicMemory(dimensions=16384, memory_file="data/test_holographic_memory.npy")
+    retrieved_value2 = memory2.retrieve(key)
+    print(f"Retrieved value after reloading: {retrieved_value2[:5]}")
+    
+    # Verify that the retrieved values match
+    if not np.allclose(retrieved_value, retrieved_value2):
+        raise ValueError("Holographic memory persistence test failed: Retrieved values do not match.")
+    
     print("HolographicMemory test passed.\n")
 
 def test_programming_module():
@@ -208,9 +220,9 @@ def test_hyperdimensional_utils():
 
 def main():
     test_database_setup()
-    test_domain_databases()  # New test for domain databases
+    test_domain_databases()
     test_entity_controller()
-    test_holographic_memory()
+    test_holographic_memory()  # Updated test for holographic memory
     test_programming_module()
     test_quantum_decision_tree()
     test_entanglement_hub()
