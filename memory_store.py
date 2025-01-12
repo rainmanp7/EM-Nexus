@@ -187,10 +187,11 @@ class MemoryStore:
         """
         return f"Vector[{len(vector)} dimensions]: {np.round(vector[:5], 3)}..."
 
+
 def initialize_database(db_path):
     """
-    Initialize the database with the advanced MemoryStore.
-    :param db_path: Path to the SQLite database.
+    Initialize the database with the required table.
+    :param db_path: Path to the SQLite database file.
     """
     store = MemoryStore(db_path, holographic_dimensions=16384, regularisation=0.01)
     store.close()  # Close the database connection after initialization

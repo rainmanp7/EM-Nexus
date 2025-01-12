@@ -1,12 +1,25 @@
+# entity_controller.py
+# diagnostic_test.py
+
+import sys
+import os
+import sqlite3
+
+# Add the root directory to sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(root_dir)
+
 from domains.math_module import MathModule
 from domains.english_module import EnglishModule
 from programming_module import ProgrammingModule
 from core.learning_engine import LearningEngine
 from memory_store import MemoryStore
+from core.holographic_memory import HolographicMemory  # Import HolographicMemory
 
 class EntityController:
     def __init__(self):
-        # Initialize the LearningEngine with a MemoryStore
+        # Initialize the LearningEngine with a MemoryStore and HolographicMemory
+        self.holographic_memory = HolographicMemory(dimensions=16384)  # Add holographic memory
         learning_engine = LearningEngine(MemoryStore("data/entity_memory.db"))
 
         # Initialize modules with required arguments
