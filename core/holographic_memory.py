@@ -1,23 +1,42 @@
+# core/holographic_memory.py
+
 import numpy as np
 from scipy.fft import fft, ifft
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import medfilt
-import time
+import os
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class HolographicMemory:
-    def __init__(self, dimensions=16384, initial_regularization=1e-6):
+    def __init__(self, dimensions=16384, initial_regularization=1e-6, memory_file="data/holographic_memory.npy"):
         """
         Initialize holographic memory with a high-dimensional space.
         :param dimensions: Number of dimensions for memory representation.
         :param initial_regularization: Starting regularization value for iterative encoding.
+        :param memory_file: File path to save/load the memory space for persistence.
         """
         self.dimensions = dimensions
-        self.memory_space = np.zeros(dimensions, dtype=complex)  # Memory space
         self.initial_regularization = initial_regularization
+        self.memory_file = memory_file
+
+        # Load memory space from disk if it exists, otherwise initialize to zero
+        if os.path.exists(self.memory_file):
+            logging.info(f"Loading holographic memory from {self.memory_file}...")
+            self.memory_space = np.load(self.memory_file)
+        else:
+            logging.info(f"Initializing new holographic memory with {dimensions} dimensions.")
+            self.memory_space = np.zeros(dimensions, dtype=complex)
+
+    def save_memory(self):
+        """
+        Save the memory space to disk for persistence.
+        """
+        os.makedirs(os.path.dirname(self.memory_file), exist_ok=True)
+        np.save(self.memory_file, self.memory_space)
+        logging.info(f"Holographic memory saved to {self.memory_file}.")
 
     def normalize(self, vector):
         """Normalize a vector to unit length."""
@@ -76,6 +95,7 @@ class HolographicMemory:
             if np.linalg.norm(self.memory_space - previous_memory) < tolerance:
                 logging.info(f"[HolographicMemory] Converged after {i + 1} iterations.")
                 break
+        self.save_memory()  # Save memory after encoding
 
     def compress_memory(self, threshold=None):
         """
@@ -89,55 +109,5 @@ class HolographicMemory:
         retained_elements = np.sum(mask)
         compression_ratio = retained_elements / self.dimensions
         self.memory_space[~mask] = 0
+        self.save_memory()  # Save memory after compression
         return compression_ratio
-
-# Example Usage
-if __name__ == "__main__":
-    # Initialize holographic memory
-    memory = HolographicMemory(dimensions=16384)
-
-    # Generate random key and value
-    key = np.random.randn(16384)
-    value = np.random.randn(16384)
-
-    # Encode the key-value pair
-    logging.info("Encoding key-value pair...")
-    start_time = time.time()
-    memory.dynamic_encode(key, value)
-    encoding_time = time.time() - start_time
-    logging.info(f"Encoding completed in {encoding_time:.4f} seconds.")
-
-    # Retrieve the value
-    logging.info("Retrieving value...")
-    start_time = time.time()
-    retrieved_value = memory.retrieve(key)
-    retrieval_time = time.time() - start_time
-    logging.info(f"Retrieval completed in {retrieval_time:.4f} seconds.")
-
-    # Calculate MSE between original and retrieved value
-    mse = np.mean((value - retrieved_value) ** 2)
-    logging.info(f"Mean Squared Error (MSE): {mse:.4f}")
-
-    # Print retrieved value (first 5 elements)
-    print(f"Retrieved value (first 5 elements): {retrieved_value[:5]}")
-
-    # Compress memory and measure compression ratio
-    logging.info("Compressing memory...")
-    start_time = time.time()
-    compression_ratio = memory.compress_memory()
-    compression_time = time.time() - start_time
-    logging.info(f"Compression completed in {compression_time:.4f} seconds.")
-    logging.info(f"Compression ratio: {compression_ratio * 100:.2f}% of memory retained.")
-
-    # Retrieve after compression
-    start_time = time.time()
-    retrieved_value_compressed = memory.retrieve(key)
-    retrieval_time_compressed = time.time() - start_time
-    logging.info(f"Retrieval after compression completed in {retrieval_time_compressed:.4f} seconds.")
-
-    # Calculate MSE after compression
-    mse_compressed = np.mean((value - retrieved_value_compressed) ** 2)
-    logging.info(f"Mean Squared Error (MSE) after compression: {mse_compressed:.4f}")
-
-    # Print retrieved value after compression (first 5 elements)
-    print(f"Retrieved value after compression (first 5 elements): {retrieved_value_compressed[:5]}")

@@ -14,6 +14,7 @@ from domains.math_module import MathModule
 from domains.english_module import EnglishModule
 from domains.python_module import PythonModule
 from domains.science_module import ScienceModule
+from core.holographic_memory import HolographicMemory  # Import HolographicMemory
 
 class SuperEntity:
     def __init__(self, name, meta_entity=None, holographic_memory=None):
@@ -24,6 +25,10 @@ class SuperEntity:
         self.science_memory = MemoryStore(db_path="data/science.db")
         self.learning_engine = LearningEngine(self.math_memory)  # Default to math memory
         self.entanglement_hub = EntanglementHub(self.name)
+        
+        # Initialize holographic memory if not provided
+        self.holographic_memory = holographic_memory if holographic_memory else HolographicMemory(memory_file=f"data/{name}_holographic_memory.npy")
+        
         self.modules = {
             "math": MathModule(memory_dimensions=16384, memory_store=self.math_memory),
             "english": EnglishModule(memory_dimensions=16384, memory_store=self.english_memory),
@@ -31,7 +36,6 @@ class SuperEntity:
             "science": ScienceModule(self.learning_engine, memory_store=self.science_memory),
         }
         self.meta_entity = meta_entity
-        self.holographic_memory = holographic_memory
 
     def process_task(self, domain, task_input):
         """

@@ -10,6 +10,7 @@ sys.path.append(root_dir)
 from memory_store import MemoryStore
 from core.meta_learning import MetaLearning
 from core.entity_core import SuperEntity
+from core.holographic_memory import HolographicMemory  # Import HolographicMemory
 
 class MetaEntity:
     def __init__(self, name):
@@ -17,6 +18,7 @@ class MetaEntity:
         self.memory = MemoryStore(db_path="data/meta_memory.db")
         self.meta_learning = MetaLearning()
         self.entities = []  # List of entities managed by the meta-entity
+        self.holographic_memory = HolographicMemory(memory_file=f"data/{name}_holographic_memory.npy")  # Persistent holographic memory
 
     def register_entity(self, entity):
         """Register an individual entity with the meta-entity."""
