@@ -52,21 +52,15 @@ def main():
         for result in results:
             if isinstance(result, dict) and "domain" in result:
                 if result["domain"] == "math":
-                    # Extract the numerical result from the string (e.g., "Solution: 30" -> 30)
-                    result_value = float(result["result"].split(": ")[1]) if "Solution: " in result["result"] else 0
-                    # Convert input_data (dictionary) to a numerical array (e.g., [10, 20])
+                    result_value = float(result["result"]) if isinstance(result["result"], (int, float)) else 0
                     input_data = np.array([task["sub_tasks"][0]["input"]["a"], task["sub_tasks"][0]["input"]["b"]], dtype=float)
                     normal_entity1.learning_engine.learn(input_data, result_value)
                 elif result["domain"] == "english":
-                    # Convert the English result to a numerical format (e.g., hash of the string)
-                    result_value = float(hash(result["result"]))
-                    # Convert input_data (string) to a numerical array (e.g., hash of the string)
+                    result_value = float(hash(str(result["result"])))
                     input_data = np.array([float(hash(task["sub_tasks"][1]["input"]))], dtype=float)
                     normal_entity2.learning_engine.learn(input_data, result_value)
                 elif result["domain"] == "python":
-                    # Convert the Python result to a numerical format (e.g., hash of the string)
-                    result_value = float(hash(result["result"]))
-                    # Convert input_data (string) to a numerical array (e.g., hash of the string)
+                    result_value = float(hash(str(result["result"])))
                     input_data = np.array([float(hash(task["sub_tasks"][2]["input"]))], dtype=float)
                     super_entity1.learning_engine.learn(input_data, result_value)
 
